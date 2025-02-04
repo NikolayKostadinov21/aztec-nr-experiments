@@ -3,37 +3,45 @@ mod test;
 
 #[aztec]
 contract Main {
-    use dep::aztec::{macros::{functions::{initializer, public}, storage::storage}};
+    use dep::aztec::{macros::{functions::{initializer, public, view}, storage::storage}};
     use dep::aztec::prelude::{AztecAddress, Map, PublicImmutable, PublicMutable};
 
     #[storage]
     struct Storage<Context> {
-        single: Map<Field, PublicMutable<Field, Context>, Context>,
-        fields: PublicMutable<Field, Context>,
+        field_in_map: Map<Field, PublicMutable<Field, Context>, Context>,
+        just_field: PublicMutable<Field, Context>,
     }
 
     #[public]
     #[initializer]
     fn constructor() {
-        storage.single.at(1).write(1);
-        storage.fields.write(69);
+        storage.field_in_map.at(1).write(1);
+        storage.just_field.write(700);
     }
 
     #[public]
-    fn set_storage_fields(value: Field) {
-        storage.fields.write(value);
+    fn set_just_field(value: Field) {
+        storage.just_field.write(value);
     }
 
-    unconstrained fn read_fields_value(key: Field) -> Field {
-        storage.fields.read()
+    // unconstrained fn read_just_field_value() -> Field {
+    //     storage.just_field.read()
+    // }
+
+    #[public]
+    #[view]
+    unconstrained fn get_just_field() -> Field {
+        storage.just_field.read()
     }
 
     #[public]
-    fn set_storage_single(key: Field, value: Field) {
-        storage.single.at(key).write(value);
+    fn set_field_in_map(key: Field, value: Field) {
+        storage.field_in_map.at(key).write(value);
     }
 
-    unconstrained fn read_storage_single(key: Field) -> Field {
-        storage.single.at(key).read()
+    #[public]
+    #[view]
+    unconstrained fn read_field_in_map(key: Field) -> pub Field {
+        storage.field_in_map.at(key).read()
     }
 }
