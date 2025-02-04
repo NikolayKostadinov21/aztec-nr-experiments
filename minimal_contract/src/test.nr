@@ -26,7 +26,8 @@ unconstrained fn test_set_feeds() {
     let (env, main_contract_address) = setup();
 
     let key = 3;
-    let get_just_field = Main::at(main_contract_address).double(key).view(&mut env.public());
+    let get_just_field = Main::at(main_contract_address).doublee(key).view(&mut env.public());
     println("get_just_field");
     println(get_just_field as u32);
+    assert(get_just_field == 6);
 }

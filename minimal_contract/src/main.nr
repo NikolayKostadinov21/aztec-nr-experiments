@@ -3,7 +3,7 @@ mod test;
 
 #[aztec]
 contract Main {
-    use dep::aztec::{macros::{functions::{initializer, public, view}}};
+    use dep::aztec::{macros::{functions::{initializer, public, view, private}}};
 
     #[public]
     #[initializer]
