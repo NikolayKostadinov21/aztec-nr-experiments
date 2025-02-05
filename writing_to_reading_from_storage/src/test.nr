@@ -19,6 +19,7 @@ unconstrained pub fn setup() -> (&mut TestEnvironment, AztecAddress) {
         initializer_call_interface,
     );
 
+    env.advance_block_by(1);
     (&mut env, main_contract.to_address())
 }
 

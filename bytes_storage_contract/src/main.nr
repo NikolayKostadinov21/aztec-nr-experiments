@@ -5,7 +5,7 @@ mod tests;
 contract Main {
     use dep::aztec::{macros::{functions::{initializer, public}, storage::storage}};
     use dep::aztec::prelude::{AztecAddress, Map, PublicImmutable, PublicMutable};
-    use dep::aztec::protocol_types::traits::{Serialize, Deserialize};
+    use dep::aztec::protocol_types::traits::{Packable, Serialize, Deserialize};
 
     #[storage]
     struct Storage<Context> {
@@ -26,14 +26,12 @@ contract Main {
         data: BoundedVec<Field, TWO_DATA_FEED_LEN_AS_FIELDS>
     }
 
-    impl Serialize<TWO_DATA_FEED_LEN_AS_FIELDS> for FeedDataLenTwo {
-        fn serialize(self) -> [Field; TWO_DATA_FEED_LEN_AS_FIELDS] {
+    impl Packable<TWO_DATA_FEED_LEN_AS_FIELDS> for FeedDataLenTwo {
+        fn pack(self) -> [Field; TWO_DATA_FEED_LEN_AS_FIELDS] {
             self.data.storage
         }
-    }
 
-    impl Deserialize<TWO_DATA_FEED_LEN_AS_FIELDS> for FeedDataLenTwo {
-        fn deserialize(input: [Field; TWO_DATA_FEED_LEN_AS_FIELDS]) -> Self {
+        fn unpack(input: [Field; TWO_DATA_FEED_LEN_AS_FIELDS]) -> Self {
             Self {
                 data: BoundedVec::from_array(input)
             }
@@ -44,14 +42,12 @@ contract Main {
         data: BoundedVec<Field, MAX_DATA_FEED_LEN_AS_FIELDS>
     }
 
-    impl Serialize<MAX_DATA_FEED_LEN_AS_FIELDS> for FeedDataMaxLen {
-        fn serialize(self) -> [Field; MAX_DATA_FEED_LEN_AS_FIELDS] {
+    impl Packable<MAX_DATA_FEED_LEN_AS_FIELDS> for FeedDataMaxLen {
+        fn pack(self) -> [Field; MAX_DATA_FEED_LEN_AS_FIELDS] {
             self.data.storage
         }
-    }
 
-    impl Deserialize<MAX_DATA_FEED_LEN_AS_FIELDS> for FeedDataMaxLen {
-        fn deserialize(input: [Field; MAX_DATA_FEED_LEN_AS_FIELDS]) -> Self {
+        fn unpack(input: [Field; MAX_DATA_FEED_LEN_AS_FIELDS]) -> Self {
             Self {
                 data: BoundedVec::from_array(input)
             }
