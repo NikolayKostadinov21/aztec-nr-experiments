@@ -24,9 +24,9 @@ contract Main {
         storage.just_field.write(value);
     }
 
-    // unconstrained fn read_just_field_value() -> Field {
-    //     storage.just_field.read()
-    // }
+    unconstrained fn read_just_field_value() -> Field {
+        storage.just_field.read()
+    }
 
     #[public]
     #[view]
