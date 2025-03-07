@@ -1,2 +1,1 @@
-contract Main {
-}
+contract Main {}
