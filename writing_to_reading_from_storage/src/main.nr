@@ -3,7 +3,7 @@ mod test;
 
 #[aztec]
 contract Main {
-    use dep::aztec::{macros::{functions::{initializer, public, view}, storage::storage}};
+    use dep::aztec::macros::{functions::{initializer, public, view}, storage::storage};
     use dep::aztec::prelude::{AztecAddress, Map, PublicImmutable, PublicMutable};
 
     #[storage]
@@ -30,7 +30,7 @@ contract Main {
 
     #[public]
     #[view]
-    unconstrained fn get_just_field() -> Field {
+    fn get_just_field() -> pub Field {
         storage.just_field.read()
     }
 
@@ -41,7 +41,7 @@ contract Main {
 
     #[public]
     #[view]
-    unconstrained fn read_field_in_map(key: Field) -> pub Field {
+    fn read_field_in_map(key: Field) -> pub Field {
         storage.field_in_map.at(key).read()
     }
 }
