@@ -1,7 +1,8 @@
 [package]
-name = "empty_contract"
+name = "u256_field_in_smart_contract"
 type = "contract"
 authors = [""]
 
 [dependencies]
 aztec = { git = "https://github.com/AztecProtocol/aztec-packages", tag = "aztec-packages-v0.76.4", directory = "noir-projects/aztec-nr/aztec" }
+bignum = { tag = "v0.0.1", git = "https://github.com/NikolayKostadinov21/noir-u256-for-smart-contracts" }
