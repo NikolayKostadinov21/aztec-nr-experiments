@@ -4,7 +4,9 @@ mod test;
 #[aztec]
 contract Main {
     use dep::aztec::macros::{functions::{initializer, public, view}, storage::storage};
+    // use dep::aztec::oracle::debug_log::debug_log;
     use dep::aztec::prelude::{AztecAddress, Map, PublicImmutable, PublicMutable};
+    use aztec::protocol_types::debug_log::debug_log;
 
     #[storage]
     struct Storage<Context> {
@@ -15,12 +17,14 @@ contract Main {
     #[public]
     #[initializer]
     fn constructor() {
+        debug_log("asdf");
         storage.field_in_map.at(1).write(1);
         storage.just_field.write(700);
     }
 
     #[public]
     fn set_just_field(value: Field) {
+        debug_log("asdf");
         storage.just_field.write(value);
     }
 
