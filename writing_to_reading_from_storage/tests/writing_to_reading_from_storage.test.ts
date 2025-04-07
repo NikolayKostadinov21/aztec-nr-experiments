@@ -1,17 +1,13 @@
-import { AccountManager, AccountWallet, CompleteAddress, ContractDeployer, createLogger, Fr, PXE, waitForPXE, TxStatus, createPXEClient, getContractInstanceFromDeployParams, Logger } from "@aztec/aztec.js";
-import { getInitialTestAccountsWallets, generateSchnorrAccounts } from "@aztec/accounts/testing"
-import { getSchnorrAccount } from '@aztec/accounts/schnorr';
-import { spawn } from 'child_process';
-import { SponsoredFeePaymentMethod } from './sponsored_fee_payment_method.js';
-
+import { AccountManager, AccountWallet, CompleteAddress, ContractDeployer, createLogger, Fr, PXE, waitForPXE, TxStatus, createPXEClient, getContractInstanceFromDeployParams, Logger, FeeJuicePaymentMethod } from "@aztec/aztec.js";
+import { getInitialTestAccountsWallets } from "@aztec/accounts/testing"
 import {
     MainContract, MainContractArtifact
 } from '../src/artifacts/Main.js';
-
+import { GasSettings, getGasLimits } from '@aztec/stdlib/gas';
 import { beforeAll, describe, expect, test } from 'vitest';
 
+const { PXE_URL = 'http://localhost:8080' } = process.env;
 const setupSandbox = async () => {
-    const { PXE_URL = 'http://localhost:8080' } = process.env;
     const pxe = createPXEClient(PXE_URL);
     await waitForPXE(pxe);
     return pxe;
@@ -25,7 +21,7 @@ describe('Reading from/Writing to storage', () => {
 
     beforeAll(async () => {
         pxe = await setupSandbox();
-
+        console.log('goes here')
         wallets = await getInitialTestAccountsWallets(pxe);
         accounts = wallets.map(w => w.getCompleteAddress());
     });
@@ -43,6 +39,10 @@ describe('Reading from/Writing to storage', () => {
                 deployer: wallets[0].getAddress(),
             },
         );
+
+        // const makeTransferRequest = () => bananaCoin.methods.transfer_in_public(aliceAddress, bobAddress, 1n, 0n);
+        // const estimatedGas = await makeTransferRequest().estimateGs();
+
 
         const deployer = new ContractDeployer(
             mainContractArtifact,
@@ -73,16 +73,27 @@ describe('Reading from/Writing to storage', () => {
         expect(receiptAfterMined.contract.instance.address).toEqual((await deploymentData).address)
     }, 30000);
 
-    test('Sets new feeds', async () => {
+    test.only('Write one field to storage', async () => {
         const contract = await MainContract.deploy(wallets[0])
             .send()
             .deployed();
+        const aliceWallet = wallets[0].getAddress();
+        const gasFees = await wallets[0].getCurrentBaseFees();
 
-        await contract
-            .withWallet(wallets[0])
-            .methods.set_just_field(1)
-            .send()
-            .wait();
+        let tx_req_write_field_to_storage = contract.withWallet(wallets[0]).methods.set_just_field(1);
+
+        const estimated_write_field_to_storage = await tx_req_write_field_to_storage.estimateGas();
+        console.log("estimated_write_field_to_storage: ", estimated_write_field_to_storage);
+
+        let paymentMethod = new FeeJuicePaymentMethod(aliceWallet);
+        let sent_tx_for_writing_field_to_storage = await tx_req_write_field_to_storage.send({
+            fee: {
+                gasSettings: estimated_write_field_to_storage,
+                paymentMethod
+            }
+        }).wait();
+        console.log("sent_tx_for_writing_field_to_storage: ", sent_tx_for_writing_field_to_storage);
+        console.log("sent_tx_for_writing_field_to_storage.transactionFee: ", sent_tx_for_writing_field_to_storage.transactionFee);
     }, 30000);
 
 });

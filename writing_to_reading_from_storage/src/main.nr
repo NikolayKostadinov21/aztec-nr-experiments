@@ -1,5 +1,5 @@
 use dep::aztec::macros::aztec;
-mod test;
+// mod test;
 
 #[aztec]
 contract Main {
@@ -16,15 +16,15 @@ contract Main {
 
     #[public]
     #[initializer]
-    fn constructor() {
-        debug_log("asdf");
+    fn constructor() { // TODO: check if constructor writing has any effect on the gas cost
         storage.field_in_map.at(1).write(1);
         storage.just_field.write(700);
     }
 
+
+    // TODO: check if useless content affects Gas costs
     #[public]
     fn set_just_field(value: Field) {
-        debug_log("asdf");
         storage.just_field.write(value);
     }
 
