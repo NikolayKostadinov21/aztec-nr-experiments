@@ -1,5 +1,5 @@
 [package]
-name = "empty_contract"
+name = "gas_experiments"
 type = "contract"
 authors = [""]
 
