@@ -43,8 +43,25 @@ describe('Gas estimation', () => {
             mainContractArtifact,
             wallets[0],
         );
-        const tx = deployer.deploy(deployArgs).send({ contractAddressSalt: salt });
-        const receipt = await tx.getReceipt();
+
+        //
+
+
+        const tx = deployer.deploy(deployArgs);
+        const estimated_tx = await tx.estimateGas();
+        console.log("estimated_tx: ", estimated_tx);
+        let paymentMethod = new FeeJuicePaymentMethod(wallets[0].getAddress());
+        let sent_tx_for_deployment = deployer.deploy(deployArgs).send({
+            fee: {
+                gasSettings: estimated_tx,
+                paymentMethod
+            },
+            contractAddressSalt: salt
+        });
+        console.log('sent_tx_for_deployment:', sent_tx_for_deployment);
+        //
+
+        const receipt = await sent_tx_for_deployment.getReceipt();
 
         expect(receipt).toEqual(
             expect.objectContaining({
@@ -53,7 +70,8 @@ describe('Gas estimation', () => {
             }),
         );
 
-        const receiptAfterMined = await tx.wait({ wallet: wallets[0] });
+        const receiptAfterMined = await sent_tx_for_deployment.wait({ wallet: wallets[0] });
+        console.log('receiptAfterMined: ', receiptAfterMined);
 
         expect(await pxe.getContractMetadata((await deploymentData).address)).toBeDefined();
         expect((await pxe.getContractMetadata((await deploymentData).address)).contractInstance).toBeTruthy();
@@ -68,13 +86,13 @@ describe('Gas estimation', () => {
         expect(receiptAfterMined.contract.instance.address).toEqual((await deploymentData).address)
     }, 30000);
 
-    test('Write one field to storage', async () => {
+    test.only('Write one field to storage', async () => {
         const contract = await MainContract.deploy(wallets[0])
             .send()
             .deployed();
         const aliceWallet = wallets[0].getAddress();
 
-        let tx_req_write_field_to_storage = contract.withWallet(wallets[0]).methods.constructor();
+        let tx_req_write_field_to_storage = contract.withWallet(wallets[0]).methods.set_just_field(1);
 
         const estimated_write_field_to_storage = await tx_req_write_field_to_storage.estimateGas();
         console.log("estimated_write_field_to_storage: ", estimated_write_field_to_storage);

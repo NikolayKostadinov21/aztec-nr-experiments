@@ -10,10 +10,14 @@ contract Main {
     #[public]
     #[initializer]
     fn constructor() {}
-    // #[storage]
-    // struct Storage<Context> {
-    //     // field_in_map: Map<Field, PublicMutable<Field, Context>, Context>,
-    //     just_field: PublicMutable<Field, Context>,
-    // }
+    #[storage]
+    struct Storage<Context> {
+        // field_in_map: Map<Field, PublicMutable<Field, Context>, Context>,
+        just_field: PublicMutable<Field, Context>,
+    }
 
+    #[public]
+    fn set_just_field(value: Field) {
+        storage.just_field.write(value);
+    }
 }
