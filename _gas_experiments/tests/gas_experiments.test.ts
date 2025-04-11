@@ -86,7 +86,7 @@ describe('Gas estimation', () => {
         expect(receiptAfterMined.contract.instance.address).toEqual((await deploymentData).address)
     }, 30000);
 
-    test.only('Write one field to storage', async () => {
+    test('Write one field to storage', async () => {
         const contract = await MainContract.deploy(wallets[0])
             .send()
             .deployed();
@@ -109,4 +109,26 @@ describe('Gas estimation', () => {
         console.log("sent_tx_for_writing_field_to_storage.transactionFee: ", sent_tx_for_writing_field_to_storage.transactionFee);
     }, 30000);
 
+    test.only('Reading one field to storage', async () => {
+        const contract = await MainContract.deploy(wallets[0])
+            .send()
+            .deployed();
+        const aliceWallet = wallets[0].getAddress();
+
+        let tx_req_write_field_to_storage = contract.withWallet(wallets[0]).methods.get_just_field();
+
+        const estimated_write_field_to_storage = await tx_req_write_field_to_storage.estimateGas();
+        console.log("estimated_write_field_to_storage: ", estimated_write_field_to_storage);
+
+        let paymentMethod = new FeeJuicePaymentMethod(aliceWallet);
+        let sent_tx_for_writing_field_to_storage = await tx_req_write_field_to_storage.send({
+            fee: {
+                gasSettings: estimated_write_field_to_storage,
+                paymentMethod
+            }
+        }).wait();
+
+        console.log("sent_tx_for_writing_field_to_storage: ", sent_tx_for_writing_field_to_storage);
+        console.log("sent_tx_for_writing_field_to_storage.transactionFee: ", sent_tx_for_writing_field_to_storage.transactionFee);
+    }, 30000);
 });

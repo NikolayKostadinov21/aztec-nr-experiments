@@ -20,4 +20,10 @@ contract Main {
     fn set_just_field(value: Field) {
         storage.just_field.write(value);
     }
+
+    #[public]
+    #[view]
+     fn get_just_field() -> Field {
+        storage.just_field.read()
+    }
 }
