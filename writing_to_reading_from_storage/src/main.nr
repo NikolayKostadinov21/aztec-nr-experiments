@@ -2,10 +2,10 @@ use dep::aztec::macros::aztec;
 // mod test;
 
 #[aztec]
-contract Main {
+pub contract Main {
     use dep::aztec::macros::{functions::{initializer, public, view}, storage::storage};
     // use dep::aztec::oracle::debug_log::debug_log;
-    use dep::aztec::prelude::{AztecAddress, Map, PublicImmutable, PublicMutable};
+    use dep::aztec::prelude::{PublicContext, AztecAddress, Map, PublicImmutable, PublicMutable};
     use aztec::protocol_types::debug_log::debug_log;
 
     #[storage]
@@ -28,14 +28,15 @@ contract Main {
         storage.just_field.write(value);
     }
 
-    unconstrained fn read_just_field_value() -> Field {
-        storage.just_field.read()
-    }
+    // unconstrained fn read_just_field_value() -> pub Field {
+    //     storage.just_field
+    // }
 
     #[public]
     #[view]
-    fn get_just_field() -> pub Field {
-        storage.just_field.read()
+    fn get_just_field() -> Field {
+        let y = 20;
+        quadruple(storage, y)
     }
 
     #[public]
@@ -45,7 +46,13 @@ contract Main {
 
     #[public]
     #[view]
-    fn read_field_in_map(key: Field) -> pub Field {
+    fn read_field_in_map(key: Field) -> Field {
         storage.field_in_map.at(key).read()
+    }
+
+    #[contract_library_method]
+    fn quadruple(storage: Storage<&mut PublicContext>, x: Field) -> Field {
+        let just_one_field = storage.just_field.read();
+        (5 * 20) * just_one_field
     }
 }
