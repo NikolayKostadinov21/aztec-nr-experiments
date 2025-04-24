@@ -10,15 +10,15 @@
   "type": "module",
   "module": "esnext",
   "dependencies": {
-    "@aztec/aztec.js": "0.84.0",
-    "@aztec/stdlib": "^0.84.0",
+    "@aztec/aztec.js": "0.85.0",
+    "@aztec/stdlib": "^0.85.0",
     "tslib": "^2.8.1",
     "vite": "^6.2.5"
   },
   "devDependencies": {
-    "@aztec/accounts": "^0.84.0",
-    "@aztec/builder": "0.84.0",
-    "@aztec/noir-contracts.js": "0.84.0",
+    "@aztec/accounts": "^0.85.0",
+    "@aztec/builder": "0.85.0",
+    "@aztec/noir-contracts.js": "0.85.0",
     "@babel/preset-typescript": "^7.27.0",
     "@types/node": "^22.14.0",
     "typescript": "^5.5.4",
