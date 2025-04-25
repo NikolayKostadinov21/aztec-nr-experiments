@@ -24,7 +24,7 @@ describe('Gas estimation', () => {
         wallets = await getInitialTestAccountsWallets(pxe);
         accounts = wallets.map(w => w.getCompleteAddress());
     });
-    test('Deploying the contract', async () => {
+    test.skip('Deploying the contract', async () => {
         const salt = Fr.random();
         const mainContractArtifact =
             MainContractArtifact;
@@ -86,36 +86,101 @@ describe('Gas estimation', () => {
         expect(receiptAfterMined.contract.instance.address).toEqual((await deploymentData).address)
     }, 30000);
 
-    test('Write one field to storage', async () => {
+    test.only('Write to storage one field in hashmap', async () => {
+        console.log('==========================Write to storage one field in hashmap===================================');
         const contract = await MainContract.deploy(wallets[0])
             .send()
             .deployed();
         const aliceWallet = wallets[0].getAddress();
 
-        let tx_req_write_field_to_storage = contract.withWallet(wallets[0]).methods.set_just_field(1);
+        let tx_req_write_field_to_storage = contract.withWallet(wallets[0]).methods.write_field_in_hashmap(0, 1);
 
-        const estimated_write_field_to_storage = await tx_req_write_field_to_storage.estimateGas();
-        console.log("estimated_write_field_to_storage: ", estimated_write_field_to_storage);
+        const estimated_write_field_to_storage_in_hashmap = await tx_req_write_field_to_storage.estimateGas();
+        console.log("estimated_write_field_to_storage_in_hashmap: ", estimated_write_field_to_storage_in_hashmap);
 
         let paymentMethod = new FeeJuicePaymentMethod(aliceWallet);
         let sent_tx_for_writing_field_to_storage = await tx_req_write_field_to_storage.send({
             fee: {
-                gasSettings: estimated_write_field_to_storage,
+                gasSettings: estimated_write_field_to_storage_in_hashmap,
                 paymentMethod
             }
         }).wait();
 
-        console.log("sent_tx_for_writing_field_to_storage: ", sent_tx_for_writing_field_to_storage);
-        console.log("sent_tx_for_writing_field_to_storage.transactionFee: ", sent_tx_for_writing_field_to_storage.transactionFee);
+        console.log("Write to storage one field in hashmap: ", sent_tx_for_writing_field_to_storage);
+        console.log("Write to storage one field in hashmap's transactionFee: ", sent_tx_for_writing_field_to_storage.transactionFee);
+
+        let returnedValue = await contract.withWallet(wallets[0]).methods.get_field_from_hashmap(0).simulate();
+        console.log('returnedValue', returnedValue);
+        expect(returnedValue).toBe(1n);
+
+
+        let tx_req_read_field_to_storage = contract.withWallet(wallets[0]).methods.get_field_from_hashmap(0);
+
+        const estimated_read_field_to_storage = await tx_req_read_field_to_storage.estimateGas();
+        console.log("estimated_read_field_to_storage: ", estimated_read_field_to_storage);
+
+        let sent_tx_for_reading_field_to_storage = await tx_req_read_field_to_storage.send({
+            fee: {
+                gasSettings: estimated_read_field_to_storage,
+                paymentMethod
+            }
+        }).wait();
+
+        console.log("Reading one field from hashmap: ", sent_tx_for_reading_field_to_storage);
+        console.log("Reading one field from hashmap's transactionFee: ", sent_tx_for_reading_field_to_storage.transactionFee);
+
     }, 30000);
 
-    test.only('Reading one field to storage', async () => {
+    test.only('Write directly to storage one field', async () => {
+        console.log('==========================Write directly to storage one field===================================');
         const contract = await MainContract.deploy(wallets[0])
             .send()
             .deployed();
         const aliceWallet = wallets[0].getAddress();
 
-        let tx_req_write_field_to_storage = contract.withWallet(wallets[0]).methods.get_just_field();
+        let tx_req_write_field_to_storage = contract.withWallet(wallets[0]).methods.directly_write_field_to_storage(0, 1);
+
+        const estimated_directly_write_field_to_storage = await tx_req_write_field_to_storage.estimateGas();
+        console.log("estimated_directly_write_field_to_storage: ", estimated_directly_write_field_to_storage);
+
+        let paymentMethod = new FeeJuicePaymentMethod(aliceWallet);
+        let sent_tx_for_writing_field_to_storage = await tx_req_write_field_to_storage.send({
+            fee: {
+                gasSettings: estimated_directly_write_field_to_storage,
+                paymentMethod
+            }
+        }).wait();
+
+        console.log("Write directly to storage one field: ", sent_tx_for_writing_field_to_storage);
+        console.log("Write directly to storage one field's transactionFee: ", sent_tx_for_writing_field_to_storage.transactionFee);
+
+        let returnedValue = await contract.withWallet(wallets[0]).methods.directly_get_field_from_storage(0).simulate();
+        console.log('returnedValue', returnedValue);
+        expect(returnedValue).toBe(1n);
+
+        let tx_req_read_field_to_storage = contract.withWallet(wallets[0]).methods.directly_get_field_from_storage(0);
+
+        const estimated_read_field_to_storage = await tx_req_read_field_to_storage.estimateGas();
+        console.log("estimated_read_field_to_storage: ", estimated_read_field_to_storage);
+
+        let sent_tx_for_reading_field_to_storage = await tx_req_read_field_to_storage.send({
+            fee: {
+                gasSettings: estimated_read_field_to_storage,
+                paymentMethod
+            }
+        }).wait();
+
+        console.log("Reading one field from hashmap: ", sent_tx_for_reading_field_to_storage);
+        console.log("Reading one field from hashmap's transactionFee: ", sent_tx_for_reading_field_to_storage.transactionFee);
+    }, 30000);
+
+    test('Reading one field from hashmap', async () => {
+        const contract = await MainContract.deploy(wallets[0])
+            .send()
+            .deployed();
+        const aliceWallet = wallets[0].getAddress();
+
+        let tx_req_write_field_to_storage = contract.withWallet(wallets[0]).methods.get_field_from_hashmap(0);
 
         const estimated_write_field_to_storage = await tx_req_write_field_to_storage.estimateGas();
         console.log("estimated_write_field_to_storage: ", estimated_write_field_to_storage);
@@ -128,7 +193,35 @@ describe('Gas estimation', () => {
             }
         }).wait();
 
-        console.log("sent_tx_for_writing_field_to_storage: ", sent_tx_for_writing_field_to_storage);
-        console.log("sent_tx_for_writing_field_to_storage.transactionFee: ", sent_tx_for_writing_field_to_storage.transactionFee);
+        console.log("Reading one field from hashmap: ", sent_tx_for_writing_field_to_storage);
+        console.log("Reading one field from hashmap's transactionFee: ", sent_tx_for_writing_field_to_storage.transactionFee);
+
+
+        let returnedValue = await contract.withWallet(wallets[0]).methods.directly_get_field_from_storage(0).simulate();
+        console.log('returnedValue', returnedValue);
+        expect(returnedValue).toBe(1);
+    }, 30000);
+
+    test('Reading one field directly from storage', async () => {
+        const contract = await MainContract.deploy(wallets[0])
+            .send()
+            .deployed();
+        const aliceWallet = wallets[0].getAddress();
+
+        let tx_req_write_field_to_storage = contract.withWallet(wallets[0]).methods.directly_get_field_from_storage(0);
+
+        const estimated_write_field_to_storage = await tx_req_write_field_to_storage.estimateGas();
+        console.log("estimated_write_field_to_storage: ", estimated_write_field_to_storage);
+
+        let paymentMethod = new FeeJuicePaymentMethod(aliceWallet);
+        let sent_tx_for_writing_field_to_storage = await tx_req_write_field_to_storage.send({
+            fee: {
+                gasSettings: estimated_write_field_to_storage,
+                paymentMethod
+            }
+        }).wait();
+
+        console.log("Reading one field directly from storage: ", sent_tx_for_writing_field_to_storage);
+        console.log("Reading one field directly from storage's transactionFee: ", sent_tx_for_writing_field_to_storage.transactionFee);
     }, 30000);
 });

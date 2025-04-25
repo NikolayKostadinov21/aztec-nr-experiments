@@ -12,18 +12,29 @@ contract Main {
     fn constructor() {}
     #[storage]
     struct Storage<Context> {
-        // field_in_map: Map<Field, PublicMutable<Field, Context>, Context>,
+        field_in_map: Map<Field, PublicMutable<Field, Context>, Context>,
         just_field: PublicMutable<Field, Context>,
     }
 
     #[public]
-    fn set_just_field(value: Field) {
-        storage.just_field.write(value);
+    fn write_field_in_hashmap(index: Field, value: Field) {
+        storage.field_in_map.at(index).write(value);
     }
 
     #[public]
     #[view]
-     fn get_just_field() -> Field {
-        storage.just_field.read()
+     fn get_field_from_hashmap(index: Field) -> Field {
+        storage.field_in_map.at(index).read()
+    }
+
+    #[public]
+    fn directly_write_field_to_storage(storage_address: Field, value_to_write: Field) {
+        context.storage_write(storage_address, value_to_write);
+    }
+
+    #[public]
+    #[view]
+    fn directly_get_field_from_storage(storage_address: Field) -> Field {
+        context.storage_read(storage_address)
     }
 }
