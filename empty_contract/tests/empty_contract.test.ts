@@ -1,5 +1,5 @@
 import { AccountManager, AccountWallet, AztecAddress, CompleteAddress, ContractDeployer, ContractInstanceWithAddress, Fr, getContractInstanceFromDeployParams, L1FeeJuicePortalManager, PXE, SponsoredFeePaymentMethod, TxStatus } from "@aztec/aztec.js";
-import { beforeAll, describe, expect, test } from "vitest";
+import { beforeAll, beforeEach, describe, expect, test } from "vitest";
 import { setupPXE } from "../utils/setup_pxe.js";
 import { generateSchnorrAccounts } from "@aztec/accounts/testing";
 import { getSchnorrAccount } from "@aztec/accounts/schnorr";
@@ -29,9 +29,20 @@ describe("Almost empty contract", () => {
         await pxe.registerContract({ instance: sponsoredFPC, artifact: SponsoredFPCContract.artifact });
         sponsoredPaymentMethod = new SponsoredFeePaymentMethod(sponsoredFPC.address);
 
+        // generate random accounts
+        randomAccountManagers = await Promise.all(
+            (await generateSchnorrAccounts(5)).map(
+                a => getSchnorrAccount(pxe, a.secret, a.signingKey, a.salt)
+            )
+        );
+        // get corresponding wallets
+        randomWallets = await Promise.all(randomAccountManagers.map(am => am.getWallet()));
+        // get corresponding addresses
+        randomAddresses = await Promise.all(randomWallets.map(async w => (w.getCompleteAddress()).address));
+
     });
 
-    test("Deploys the contract", async () => {
+    test("Should deploys the contract", async () => {
         const salt = Fr.random();
         const mainContractArtifact = MainContractArtifact
         const accounts = await Promise.all(
@@ -73,6 +84,8 @@ describe("Almost empty contract", () => {
                 status: TxStatus.SUCCESS,
             }),
         );
+
+        console.log('random addresses: ', randomAddresses);
 
         expect(receiptAfterMined.contract.instance.address).toEqual(deploymentData.address)
     }, 100000)
