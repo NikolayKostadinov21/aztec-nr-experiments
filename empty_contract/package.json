@@ -1,0 +1,18 @@
+{
+  "name": "empty_contract",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "@aztec/accounts": "^0.87.5",
+    "@aztec/aztec.js": "^0.87.5",
+    "@aztec/noir-contracts.js": "^0.87.5",
+    "@aztec/protocol-contracts": "^0.87.5",
+    "@aztec/pxe": "^0.87.5",
+    "@aztec/stdlib": "^0.87.5"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.1",
+    "typescript": "^5.4.4"
+  }
+}
